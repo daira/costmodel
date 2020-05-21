@@ -13,24 +13,31 @@ class Cost:
 
 @dataclass
 class Model:
-    rows: int                # n
-    routable_columns: int    # M
-    total_columns: int       # N
+
+    # Relation to Turbo-PLONK proposal <docs.zkproof.org/pages/standards/accepted-workshop3/proposal-turbo_plonk.pdf>
+    # w = R+A
+    # d = D
+    # \ell = S
+
+    rows: int                # N
+    routable_columns: int    # R
+    advice_columns: int      # A
+    selector_columns: int    # S (including standard selectors maybe)
+    max_degree: int          # D
     accessible: int          # number of accessible wires on the next row
-    standard_selectors: int  # 5 (q_L, q_R, q_O, q_M, q_C)
-    selector_columns: int    # number of additional q variables
+    #standard_selectors: int  # 5 (q_L, q_R, q_O, q_M, q_C)
 
     def prover_cost(self):
         k = (rows-1).bit_length()
         n = 1 << k
         iffts = 0
-        ffts = [M*n,
+        ffts = [R*rows,
                 ???,         # "after some FFTs"
                ]
         msms = [rows,
                 rows,        # permutation poly
-                [M*n]*M,     # "which it commits to in M separate commitments"
-                [3]*N ???,   # "openings for each wire at each location a gate queries it at"
+                [R*rows]*R,  # "which it commits to in R separate commitments"
+                [3]*(R+A) ?, # "openings for each wire at each location a gate queries it at"
                 [rows],      # "opening polynomial to show these openings are correct"
                 ???,         # "combined using random challenges and the prover opens it"
                ]
@@ -43,7 +50,7 @@ class Model:
 
 def main():
     k = 17
-    n = 1<<k
+    N = 1<<k
     ...
 
     ecc = Block(advice, selector, ?)
